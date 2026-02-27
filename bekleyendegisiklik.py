@@ -32,9 +32,9 @@ COLOR_IDS = [
 COLOR_DEFINITIONS = [
 	" id:green value:rgb(0,0.5,0)",
 	" id:lime value:rgb(0.2,0.8,0.2)",
-	" id:yellow value:rgb(1,1,0.2)",
-	" id:gold value:rgb(1,0.84,0)",
-	" id:orange value:rgb(1,0.65,0)",
+	" id:yellow value:rgb(0.75,1,0)",
+	" id:gold value:rgb(1,1,0.2)",
+	" id:orange value:rgb(1,0.75,0.3))",
 	" id:darkorange value:rgb(1,0.55,0)",
 	" id:orangered value:rgb(1,0.27,0)",
 	" id:tomato value:rgb(1,0.39,0.28)",
@@ -130,9 +130,9 @@ def generate_timeline(data_dict, bar_increment, width, period_type="auto"):
 	if period_type == "year":
 		# Calculate period range with some margin
 		range_margin = int((max_val - min_val) * 0.05) if max_val > min_val else 100
-		period_start = ((min_val - range_margin) // 100) * 100
+		period_start = max(0, ((min_val - range_margin) // 100) * 100)
 		period_end = ((max_val + range_margin + 99) // 100) * 100
-		if period_end == period_start:
+		if period_end <= period_start:
 			period_end = period_start + 500
 		# ScaleMajor and ScaleMinor
 		scale_major = max(1, int((period_end - period_start) / 5))
@@ -146,8 +146,8 @@ def generate_timeline(data_dict, bar_increment, width, period_type="auto"):
 		else:
 			period_start = (min_val // 100) * 100
 			period_end = ((max_val + 99) // 100) * 100
-			scale_major = int((period_end - period_start) / 5)
-			scale_minor = int((period_end - period_start) / 25)
+			scale_major = int((period_end - period_start) / 5) if period_end > period_start else 20
+			scale_minor = int((period_end - period_start) / 25) if period_end > period_start else 5
 		width_str = f" width:{width}"
 
 	timeline_lines = [
@@ -169,7 +169,7 @@ def generate_timeline(data_dict, bar_increment, width, period_type="auto"):
 
 	# For day: keys are hours ("00") else days ("2025-08-14")
 	for label in sorted(data_dict.keys()):
-		val = data_dict[label]
+		val = data_dict.get(label)
 		color_id = get_color_id(val)
 		timeline_lines.append(f" color:{color_id}")
 
@@ -272,10 +272,10 @@ def run_at_exact_hour():
 			time.sleep(30)
 
 if __name__ == "__main__":
-	#print("Program başladı, hemen çalıştırılıyor...")
-	#try:
-        #        main()
-	#except Exception as e:
-	#	print(f"Hata oluştu: {e}")
+	print("Program başladı, hemen çalıştırılıyor...")
+	try:
+		main()
+	except Exception as e:
+		print(f"Hata oluştu: {e}")
 	print("Saat başı beklemeye geçiliyor...")
 	run_at_exact_hour()
